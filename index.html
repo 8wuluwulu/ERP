@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConcreteFlow ERP — Система управления бетонными заводами и логистикой</title>
+  <meta name="description" content="Умная ERP-система нового поколения для бетонных заводов. Автоматизация логистики, диспетчеризации, контроля качества и документооборота в реальном времени.">
+  
+  <!-- Geist and Geist Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Typography */
+      --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Geist Mono', 'SFMono-Regular', Consolas, monospace;
+
+      /* Palette (Stripe/Vercel Aesthetic) */
+      --bg-page: #f9fafb;
+      --bg-card: #ffffff;
+      --bg-card-hover: #fafafa;
+      --bg-dark: #09090b;
+      --bg-dark-surface: #18181b;
+      
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --text-light: #f8fafc;
+      --text-light-secondary: #a1a1aa;
+
+      /* Brand Accents - Electric Blue */
+      --accent: #0070f3;
+      --accent-hover: #005bc2;
+      --accent-soft: rgba(0, 112, 243, 0.05);
+      --accent-border: rgba(0, 112, 243, 0.15);
+      
+      /* Status Colors */
+      --status-success: #10b981;
+      --status-success-soft: rgba(16, 185, 129, 0.1);
+      --status-warning: #f59e0b;
+      --status-warning-soft: rgba(245, 158, 11, 0.1);
+      --status-error: #ef4444;
+      
+      /* Borders & Shadows */
+      --border-light: rgba(15, 23, 42, 0.08);
+      --border-glass: rgba(255, 255, 255, 0.4);
+      --border-glass-dark: rgba(255, 255, 255, 0.08);
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      --shadow-diffusion: 0 20px 40px -15px rgba(15, 23, 42, 0.05);
+      --shadow-inset-glass: inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+      
+      /* Radius rules */
+      --radius-xl: 1.75rem;
+      --radius-lg: 1.25rem;
+      --radius-md: 0.75rem;
+      --radius-sm: 0.375rem;
+      
+      /* Layout Config (Visual Density = 4) */
+      --container-width: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* Core layout helpers */
+    .container {
+      max-width: var(--container-width);
+      margin: 0 auto;
+      padding: 0 2rem;
+      width: 100%;
+    }
+
+    /* Typography Utilities */
+    h1, h2, h3, h4 {
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      font-weight: 600;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    /* Interactive States (Tactile Feedback) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+
+    .btn:active {
+      transform: scale(0.98) translateY(1px);
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: var(--text-light);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+      box-shadow: 0 4px 12px rgba(0, 112, 243, 0.15);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-card);
+      border-color: var(--border-light);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-card-hover);
+      border-color: var(--text-muted);
+    }
+
+    /* Header & Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: rgba(249, 250, 251, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-light);
+      transition: border-color 0.3s;
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 4.5rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-dot {
+      width: 0.625rem;
+      height: 0.625rem;
+      background-color: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      position: relative;
+    }
+
+    .logo-dot::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 1px solid rgba(0, 112, 243, 0.4);
+      border-radius: 50%;
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.9); opacity: 1; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.25rem;
+      list-style: none;
+    }
+
+    .nav-link a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link a:hover {
+      color: var(--text-primary);
+    }
+
+    /* Asymmetric Hero Section (Design Variance = 8, Left Content, Right Asset) */
+    .hero-section {
+      padding: 6rem 0 7rem 0;
+      position: relative;
+      overflow: hidden;
+      min-height: 90dvh;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      padding: 0.375rem 0.875rem;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .tag-pulse {
+      width: 0.5rem;
+      height: 0.5rem;
+      background-color: var(--accent);
+      border-radius: 50%;
+      animation: pulse-dot 1.5s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 112, 243, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(0, 112, 243, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 112, 243, 0); }
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-w-[55ch];
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    /* Dashboard Mockup (Hero Asset, Pure CSS/HTML Glassmorphism) */
+    .hero-asset {
+      position: relative;
+      width: 100%;
+      height: auto;
+    }
+
+    .dashboard-mockup {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-diffusion), var(--shadow-inset-glass);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      aspect-ratio: 4 / 3;
+      transform: perspective(1000px) rotateY(-5deg) rotateX(3deg);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dashboard-mockup:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+    }
+
+    .dash-header {
+      height: 3.25rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .dash-controls {
+      display: flex;
+      gap: 0.375rem;
+    }
+
+    .dash-dot {
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 50%;
+      background-color: var(--text-muted);
+      opacity: 0.3;
+    }
+
+    .dash-title-bar {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      background-color: rgba(15, 23, 42, 0.04);
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
+    }
+
+    .dash-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 3.5rem 1fr;
+      overflow: hidden;
+    }
+
+    .dash-sidebar {
+      border-right: 1px solid var(--border-light);
+      background-color: rgba(255, 255, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0;
+      gap: 1.25rem;
+    }
+
+    .sidebar-icon {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 0.375rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .sidebar-icon.active {
+      color: var(--accent);
+      background-color: var(--accent-soft);
+    }
+
+    .dash-content {
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 1rem;
+    }
+
+    .dash-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .metric-card {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+    }
+
+    .metric-sub {
+      font-size: 0.7rem;
+      color: var(--status-success);
+      margin-top: 0.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .dash-main {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .dash-main-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--status-success);
+      background-color: var(--status-success-soft);
+      padding: 0.15rem 0.5rem;
+      border-radius: 100px;
+    }
+
+    .live-pulse {
+      width: 0.35rem;
+      height: 0.35rem;
+      background-color: var(--status-success);
+      border-radius: 50%;
+      animation: pulse-dot 1.5s infinite;
+    }
+
+    .order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.625rem 0.75rem;
+      background-color: rgba(15, 23, 42, 0.02);
+      border: 1px solid rgba(15, 23, 42, 0.03);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+
+    .order-item:hover {
+      background-color: rgba(15, 23, 42, 0.04);
+      transform: translateX(2px);
+    }
+
+    .order-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .order-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .order-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .order-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .order-status {
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .order-status.en-route {
+      color: var(--accent);
+    }
+
+    .order-status.pouring {
+      color: var(--status-warning);
+    }
+
+    .order-status.completed {
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 50%;
+    }
+
+    .status-dot.blue { background-color: var(--accent); animation: pulse-blue 1.8s infinite; }
+    .status-dot.yellow { background-color: var(--status-warning); animation: pulse-yellow 1.8s infinite; }
+    .status-dot.gray { background-color: var(--text-muted); }
+
+    @keyframes pulse-blue {
+      0% { box-shadow: 0 0 0 0 rgba(0, 112, 243, 0.6); }
+      70% { box-shadow: 0 0 0 4px rgba(0, 112, 243, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 112, 243, 0); }
+    }
+
+    @keyframes pulse-yellow {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+      70% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
+    /* Tech Stack / Architecture Bar */
+    .arch-bar {
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      background-color: rgba(255, 255, 255, 0.6);
+      padding: 1.75rem 0;
+    }
+
+    .arch-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .arch-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .arch-items {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .arch-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      transition: color 0.2s;
+    }
+
+    .arch-item:hover {
+      color: var(--text-primary);
+    }
+
+    .arch-item svg {
+      width: 1.15rem;
+      height: 1.15rem;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .arch-item:hover svg {
+      color: var(--accent);
+    }
+
+    /* Bento Grid Features Section (Design Variance = 8, Asymmetrical Layout) */
+    .features-section {
+      padding: 7rem 0;
+      background-color: var(--bg-page);
+    }
+
+    .section-header {
+      margin-bottom: 4rem;
+      max-w-[700px];
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      grid-auto-rows: minmax(320px, auto);
+    }
+
+    .bento-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-diffusion);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+    }
+
+    .bento-card:hover {
+      border-color: rgba(15, 23, 42, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.08);
+    }
+
+    .bento-card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .bento-card-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      max-w-[45ch];
+      margin-bottom: 2rem;
+    }
+
+    .bento-card-header {
+      z-index: 2;
+    }
+
+    /* Bento Card 1: Map routing (span-1, but styled wider) */
+    .bento-span-2 {
+      grid-column: span 1;
+    }
+
+    .bento-card-visual {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-lg);
+      background-color: rgba(15, 23, 42, 0.02);
+      border: 1px dashed rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+    }
+
+    /* Live map simulation */
+    .map-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+    }
+
+    .map-grid {
+      stroke: rgba(15, 23, 42, 0.04);
+      stroke-width: 1;
+    }
+
+    .map-path {
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-dasharray: 6 4;
+      animation: draw-path 30s linear infinite;
+    }
+
+    @keyframes draw-path {
+      to {
+        stroke-dashoffset: -100;
+      }
+    }
+
+    .map-marker {
+      fill: var(--accent);
+      animation: bounce-marker 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce-marker {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .map-pulse {
+      fill: var(--accent);
+      opacity: 0.15;
+      transform-origin: center;
+      animation: map-ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes map-ping {
+      0% { transform: scale(1); opacity: 0.2; }
+      100% { transform: scale(3.5); opacity: 0; }
+    }
+
+    /* Bento Card 2: DB schema (span-1) */
+    .db-schema {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 90%;
+      max-width: 280px;
+    }
+
+    .schema-table {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 0.625rem 0.875rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .schema-header-db {
+      font-weight: 600;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 0.35rem;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .schema-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      padding: 0.15rem 0;
+    }
+
+    .schema-row span:last-child {
+      color: var(--text-muted);
+    }
+
+    /* Bento Card 3: API Integration (span-full) */
+    .bento-span-full {
+      grid-column: span 2;
+    }
+
+    .api-integration-visual {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 2rem;
+      width: 100%;
+      height: 100%;
+      padding: 1rem;
+    }
+
+    .integration-node {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-md);
+      min-width: 160px;
+      z-index: 2;
+    }
+
+    .node-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+    }
+
+    .node-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .integration-line {
+      flex: 1;
+      height: 2px;
+      background-color: var(--border-light);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 250px;
+    }
+
+    .integration-pulse {
+      width: 0.75rem;
+      height: 0.75rem;
+      background-color: var(--accent);
+      border-radius: 50%;
+      position: absolute;
+      animation: traverse-line 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes traverse-line {
+      0% { left: 0%; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
+
+    /* Interactive API Terminal Section (The Technical Flex) */
+    .terminal-section {
+      padding: 7rem 0;
+      background-color: var(--bg-page);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .terminal-container {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .terminal-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+
+    .api-selectors {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .api-select-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: left;
+    }
+
+    .api-select-btn:hover {
+      border-color: rgba(15, 23, 42, 0.15);
+      background-color: var(--bg-card-hover);
+      transform: translateX(4px);
+    }
+
+    .api-select-btn.active {
+      border-color: var(--accent);
+      background-color: var(--accent-soft);
+      box-shadow: 0 4px 12px rgba(0, 112, 243, 0.03);
+    }
+
+    .api-method {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+      margin-right: 0.75rem;
+    }
+
+    .api-method.get {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--status-success);
+    }
+
+    .api-method.post {
+      background-color: rgba(245, 158, 11, 0.1);
+      color: var(--status-warning);
+    }
+
+    .api-method.ws {
+      background-color: rgba(0, 112, 243, 0.1);
+      color: var(--accent);
+    }
+
+    .api-path {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .api-action-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Editor window (VS Code / Terminal style) */
+    .editor-window {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-glass-dark);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3), var(--shadow-inset-glass-dark);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 400px;
+    }
+
+    .editor-titlebar {
+      background-color: var(--bg-dark-surface);
+      height: 3rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+    }
+
+    .editor-tab {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 0.5rem 1rem;
+      border-top-left-radius: var(--radius-sm);
+      border-top-right-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .editor-tab-close {
+      color: var(--text-light-secondary);
+      opacity: 0.5;
+      font-size: 0.75rem;
+    }
+
+    .editor-status-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 100px;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--text-light-secondary);
+      transition: all 0.3s ease;
+    }
+
+    .editor-status-badge.success {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
+
+    .editor-status-badge.pending {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+    }
+
+    .editor-loader-bar {
+      height: 2px;
+      width: 100%;
+      background-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .editor-loader-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 30%;
+      background-color: var(--accent);
+      border-radius: 2px;
+      display: none;
+      animation: shimmer 1s infinite linear;
+    }
+
+    @keyframes shimmer {
+      0% { left: -30%; }
+      100% { left: 110%; }
+    }
+
+    .editor-body {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #d4d4d8;
+      position: relative;
+    }
+
+    .code-line {
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      gap: 1rem;
+    }
+
+    .line-number {
+      color: rgba(255, 255, 255, 0.25);
+      text-align: right;
+      user-select: none;
+    }
+
+    .code-content {
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* JSON Syntax Highlighting */
+    .json-key { color: #f43f5e; } /* Rose */
+    .json-string { color: #34d399; } /* Emerald */
+    .json-number { color: #fbbf24; } /* Amber */
+    .json-boolean { color: #c084fc; } /* Purple */
+    .json-null { color: #a1a1aa; }
+    .terminal-meta { color: #60a5fa; } /* Blue */
+
+    .editor-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-light-secondary);
+      opacity: 0.6;
+      gap: 1rem;
+      text-align: center;
+      position: absolute;
+      inset: 0;
+      padding: 2rem;
+    }
+
+    .editor-placeholder svg {
+      width: 3rem;
+      height: 3rem;
+      color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-light);
+      padding: 4rem 0 3rem 0;
+    }
+
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+      padding-bottom: 3rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .footer-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-w-[320px];
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 3rem;
+    }
+
+    .footer-column {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .footer-heading {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-link {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    /* Responsive Breakpoints (< 1024px) */
+    @media (max-width: 1024px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      
+      .hero-content {
+        align-items: center;
+        text-align: center;
+      }
+      
+      .hero-desc {
+        margin: 0 auto;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+
+      .dashboard-mockup {
+        max-width: 600px;
+        margin: 0 auto;
+        transform: none;
+      }
+
+      .dashboard-mockup:hover {
+        transform: none;
+      }
+
+      .terminal-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+    }
+
+    /* Mobile Collapse Breakpoint (< 768px - Mandatory layout fallbacks) */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 1.25rem;
+      }
+
+      .nav-links {
+        display: none; /* Hide header links on mobile to ensure clean space */
+      }
+
+      .hero-section {
+        padding: 4rem 0 5rem 0;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .hero-desc {
+        font-size: 1rem;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .arch-container {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .arch-items {
+        justify-content: center;
+        gap: 1.5rem;
+      }
+
+      .bento-grid {
+        grid-template-columns: 1fr !important; /* Force single column on mobile */
+        grid-auto-rows: auto;
+      }
+
+      .bento-span-full {
+        grid-column: span 1;
+      }
+
+      .bento-card {
+        padding: 1.75rem;
+        min-height: auto;
+      }
+
+      .bento-card-visual {
+        min-height: 160px;
+        margin-top: 1rem;
+      }
+
+      .api-integration-visual {
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+
+      .integration-line {
+        width: 2px;
+        height: 40px;
+        max-width: none;
+      }
+
+      .integration-pulse {
+        width: 0.75rem;
+        height: 0.75rem;
+        animation: traverse-line-vertical 3s infinite linear;
+      }
+
+      @keyframes traverse-line-vertical {
+        0% { top: 0%; opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+      }
+
+      .footer-grid {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2.5rem;
+      }
+
+      .footer-links {
+        flex-direction: column;
+        gap: 1.75rem;
+        width: 100%;
+      }
+
+      .footer-bottom {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav-container">
+      <a href="#" class="logo">
+        <span class="logo-dot"></span>
+        ConcreteFlow
+      </a>
+      
+      <ul class="nav-links">
+        <li class="nav-link"><a href="#features">Возможности</a></li>
+        <li class="nav-link"><a href="#integrations">Интеграции</a></li>
+        <li class="nav-link"><a href="#api">API</a></li>
+        <li class="nav-link"><a href="#tariffs">Тарифы</a></li>
+      </ul>
+      
+      <div>
+        <a href="#demo" class="btn btn-primary">Запросить демо</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="hero-tag">
+          <span class="tag-pulse"></span>
+          Мониторинг логистики в реальном времени
+        </div>
+        <h1 class="hero-title">ERP-система нового поколения для бетонных заводов</h1>
+        <p class="hero-desc">
+          Управляйте автопарком миксеров, отслеживайте заливки в реальном времени и автоматизируйте документооборот. Построено на надежной архитектуре для бесперебойной работы 24/7.
+        </p>
+        <div class="hero-actions">
+          <a href="#demo" class="btn btn-primary">Начать бесплатно</a>
+          <a href="#api" class="btn btn-secondary">Читать документацию</a>
+        </div>
+      </div>
+      
+      <div class="hero-asset">
+        <!-- Interactive Dashboard Mockup -->
+        <div class="dashboard-mockup">
+          <div class="dash-header">
+            <div class="dash-controls">
+              <span class="dash-dot"></span>
+              <span class="dash-dot"></span>
+              <span class="dash-dot"></span>
+            </div>
+            <div class="dash-title-bar">dispatch.concreteflow.ru</div>
+            <div style="width: 2.25rem;"></div> <!-- Spacing alignment -->
+          </div>
+          <div class="dash-body">
+            <div class="dash-sidebar">
+              <!-- Home Icon -->
+              <span class="sidebar-icon active">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+              </span>
+              <!-- Truck Icon -->
+              <span class="sidebar-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                </svg>
+              </span>
+              <!-- Database Icon -->
+              <span class="sidebar-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                </svg>
+              </span>
+              <!-- Settings Icon -->
+              <span class="sidebar-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </span>
+            </div>
+            
+            <div class="dash-content">
+              <div class="dash-metrics">
+                <div class="metric-card">
+                  <div class="metric-label">Выработка завода (сегодня)</div>
+                  <div class="metric-value">472 м³</div>
+                  <div class="metric-sub">
+                    <svg style="width: 0.8rem; height: 0.8rem;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                    +12.4% от вчера
+                  </div>
+                </div>
+                
+                <div class="metric-card">
+                  <div class="metric-label">Миксеры на линии</div>
+                  <div class="metric-value">14 / 16</div>
+                  <div class="metric-sub" style="color: var(--text-secondary);">
+                    Эффективность: 87.5%
+                  </div>
+                </div>
+              </div>
+              
+              <div class="dash-main">
+                <div class="dash-main-title">
+                  Активные заказы
+                  <span class="live-indicator">
+                    <span class="live-pulse"></span>
+                    LIVE
+                  </span>
+                </div>
+                
+                <div class="order-list">
+                  <!-- Order 1 -->
+                  <div class="order-item">
+                    <div class="order-info">
+                      <svg style="width: 1.5rem; height: 1.5rem; color: var(--accent);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                      </svg>
+                      <div class="order-details">
+                        <span class="order-title">Автобетоносмеситель №12</span>
+                        <span class="order-meta">ООО «МонолитСтрой» • B30 (M400)</span>
+                      </div>
+                    </div>
+                    <div class="order-status en-route">
+                      <span class="status-dot blue"></span>
+                      В пути (12 мин)
+                    </div>
+                  </div>
+                  
+                  <!-- Order 2 -->
+                  <div class="order-item">
+                    <div class="order-info">
+                      <svg style="width: 1.5rem; height: 1.5rem; color: var(--status-warning);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                      </svg>
+                      <div class="order-details">
+                        <span class="order-title">Автобетоносмеситель №08</span>
+                        <span class="order-meta">СК «Высота» • B22.5 (M300)</span>
+                      </div>
+                    </div>
+                    <div class="order-status pouring">
+                      <span class="status-dot yellow"></span>
+                      Заливка
+                    </div>
+                  </div>
+                  
+                  <!-- Order 3 -->
+                  <div class="order-item">
+                    <div class="order-info">
+                      <svg style="width: 1.5rem; height: 1.5rem; color: var(--text-muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                      </svg>
+                      <div class="order-details">
+                        <span class="order-title">Автобетоносмеситель №14</span>
+                        <span class="order-meta">АО «БетонГрупп» • B15 (M200)</span>
+                      </div>
+                    </div>
+                    <div class="order-status completed">
+                      <span class="status-dot gray"></span>
+                      Выполнен
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack / Architecture Bar -->
+  <section class="arch-bar" id="integrations">
+    <div class="container arch-container">
+      <div class="arch-label">Архитектура ядра</div>
+      <div class="arch-items">
+        <div class="arch-item">
+          <!-- Elephant Database Icon -->
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+          </svg>
+          PostgreSQL
+        </div>
+        <div class="arch-item">
+          <!-- Python Code Icon -->
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+          </svg>
+          Python (FastAPI)
+        </div>
+        <div class="arch-item">
+          <!-- REST API Node Icon -->
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+          </svg>
+          RESTful API
+        </div>
+        <div class="arch-item">
+          <!-- WebSockets Lightning Icon -->
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          WebSockets
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Bento Section (Design Variance = 8) -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Функционал, спроектированный для тяжелых нагрузок</h2>
+        <p>Высокая отказоустойчивость и точность операций на каждом этапе производства и доставки бетонных смесей.</p>
+      </div>
+
+      <div class="bento-grid">
+        <!-- Card 1: Маршрутизация (span-1, left side of Row 1) -->
+        <div class="bento-card bento-span-2">
+          <div class="bento-card-header">
+            <h3 class="bento-card-title">Умная маршрутизация</h3>
+            <p class="bento-card-desc">
+              Автоматическое построение маршрутов с учетом пробок, времени разгрузки и требований к сохранности подвижности бетонной смеси. Экономия топлива до 18.4%.
+            </p>
+          </div>
+          
+          <div class="bento-card-visual">
+            <!-- Simulated GPS map vector interface -->
+            <svg class="map-container" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <rect width="20" height="20" fill="none"></rect>
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(15, 23, 42, 0.03)" stroke-width="1"></path>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid-pattern)"></rect>
+              
+              <!-- Roads -->
+              <path d="M -10 100 Q 120 40 220 120 T 410 80" fill="none" stroke="rgba(15, 23, 42, 0.08)" stroke-width="8" stroke-linecap="round"></path>
+              <path d="M 80 -10 C 100 110 320 30 350 210" fill="none" stroke="rgba(15, 23, 42, 0.08)" stroke-width="6" stroke-linecap="round"></path>
+              
+              <!-- Active Route -->
+              <path class="map-path" d="M 94 82 C 110 90 220 120 220 120 T 330 115" fill="none"></path>
+              
+              <!-- Map elements (Plant, Mixer, Site) -->
+              <!-- Plant (Start) -->
+              <g transform="translate(94, 82)">
+                <circle r="12" fill="var(--bg-card)" stroke="var(--border-light)" stroke-width="1"></circle>
+                <circle r="4" fill="var(--text-secondary)"></circle>
+              </g>
+              
+              <!-- Mixer Truck Marker -->
+              <g transform="translate(210, 115)">
+                <circle class="map-pulse" r="16"></circle>
+                <circle class="map-marker" r="6"></circle>
+              </g>
+              
+              <!-- Build site (End) -->
+              <g transform="translate(330, 115)">
+                <circle r="12" fill="var(--bg-card)" stroke="var(--border-light)" stroke-width="1"></circle>
+                <polygon points="330,111 334,118 326,118" fill="var(--accent)" transform="translate(-330, -115) scale(1)"></polygon>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: DB schema (span-1, right side of Row 1) -->
+        <div class="bento-card">
+          <div class="bento-card-header">
+            <h3 class="bento-card-title">Реляционные базы данных</h3>
+            <p class="bento-card-desc">
+              Хранение критических транзакционных данных о замесах и отгрузках под защитой ACID-архитектуры PostgreSQL. Нулевой риск потери логов.
+            </p>
+          </div>
+
+          <div class="bento-card-visual" style="padding: 1rem;">
+            <!-- Database relations visual -->
+            <div class="db-schema">
+              <!-- Table 1 -->
+              <div class="schema-table">
+                <div class="schema-header-db">
+                  <span>mixers</span>
+                  <span>PK</span>
+                </div>
+                <div class="schema-row">
+                  <span>id</span>
+                  <span>int4</span>
+                </div>
+                <div class="schema-row">
+                  <span>plate</span>
+                  <span>varchar</span>
+                </div>
+                <div class="schema-row">
+                  <span>driver_id</span>
+                  <span>int4</span>
+                </div>
+              </div>
+              
+              <!-- Connector line -->
+              <div style="height: 10px; width: 2px; background-color: var(--border-light); margin-left: 20px;"></div>
+              
+              <!-- Table 2 -->
+              <div class="schema-table" style="transform: translateX(15px);">
+                <div class="schema-header-db">
+                  <span>deliveries</span>
+                  <span>PK</span>
+                </div>
+                <div class="schema-row">
+                  <span>id</span>
+                  <span>int4</span>
+                </div>
+                <div class="schema-row">
+                  <span>mixer_id</span>
+                  <span>int4 (FK)</span>
+                </div>
+                <div class="schema-row">
+                  <span>volume_m3</span>
+                  <span>numeric</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: API Integration (span-full, Row 2) -->
+        <div class="bento-card bento-span-full">
+          <div class="bento-card-header">
+            <h3 class="bento-card-title">Интеграция по API</h3>
+            <p class="bento-card-desc">
+              Готовые SDK и открытый REST API для интеграции с ERP строительных площадок и бухгалтерским ПО (1С, SAP). Передавайте данные телеметрии, ведомости взвешивания и паспорта качества напрямую в системы учета без ручного ввода.
+            </p>
+          </div>
+
+          <div class="bento-card-visual" style="min-height: 120px; background-color: rgba(15, 23, 42, 0.01);">
+            <!-- Connection webhooks flow visual -->
+            <div class="api-integration-visual">
+              <div class="integration-node">
+                <svg style="width: 1.5rem; height: 1.5rem; color: var(--text-secondary);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <span class="node-title">ConcreteFlow ERP</span>
+                <span class="node-sub">dispatch_webhook</span>
+              </div>
+              
+              <div class="integration-line">
+                <span class="integration-pulse"></span>
+              </div>
+              
+              <div class="integration-node">
+                <svg style="width: 1.5rem; height: 1.5rem; color: var(--accent);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span class="node-title">Внешняя система</span>
+                <span class="node-sub">HTTP 200 OK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive API Terminal (Technical Flex) -->
+  <section class="terminal-section" id="api">
+    <div class="container terminal-container">
+      <div class="terminal-info">
+        <div class="hero-tag">
+          <span class="tag-pulse" style="background-color: var(--accent);"></span>
+          Для разработчиков и архитекторов
+        </div>
+        <h2 class="section-title">Разработано для инженеров</h2>
+        <p>
+          Подключите управление логистикой напрямую к своей инфраструктуре. Наш API позволяет отправлять команды на погрузку, запрашивать телеметрию в реальном времени и синхронизировать статусы выполнения заказов.
+        </p>
+        
+        <div class="api-selectors">
+          <!-- Button 1 -->
+          <button class="api-select-btn active" data-endpoint="mixers">
+            <div style="display: flex; align-items: center;">
+              <span class="api-method get">GET</span>
+              <span class="api-path">/api/v1/mixers/status</span>
+            </div>
+            <span class="api-action-label">
+              Тест запроса
+              <svg style="width: 0.9rem; height: 0.9rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </span>
+          </button>
+          
+          <!-- Button 2 -->
+          <button class="api-select-btn" data-endpoint="order-create">
+            <div style="display: flex; align-items: center;">
+              <span class="api-method post">POST</span>
+              <span class="api-path">/api/v1/orders/create</span>
+            </div>
+            <span class="api-action-label">
+              Тест запроса
+              <svg style="width: 0.9rem; height: 0.9rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </span>
+          </button>
+          
+          <!-- Button 3 -->
+          <button class="api-select-btn" data-endpoint="telemetry-ws">
+            <div style="display: flex; align-items: center;">
+              <span class="api-method ws">WS</span>
+              <span class="api-path">/api/v1/telemetry/live</span>
+            </div>
+            <span class="api-action-label">
+              Тест запроса
+              <svg style="width: 0.9rem; height: 0.9rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Editor screen mock -->
+      <div class="editor-window">
+        <div class="editor-titlebar">
+          <div class="editor-tab">
+            <svg style="width: 0.8rem; height: 0.8rem; color: var(--accent);" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"></path>
+            </svg>
+            <span id="tab-filename">mixers_status.json</span>
+            <span class="editor-tab-close">×</span>
+          </div>
+          <div class="editor-status-badge" id="response-status">200 OK</div>
+        </div>
+        
+        <div class="editor-loader-bar">
+          <div class="editor-loader-progress" id="loader-progress"></div>
+        </div>
+        
+        <div class="editor-body" id="terminal-body">
+          <div class="editor-placeholder" id="terminal-placeholder">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"></path>
+            </svg>
+            <p style="color: var(--text-light-secondary); font-size: 0.85rem;">Нажмите кнопку API-запроса слева, чтобы симулировать отправку данных и получить ответ сервера.</p>
+          </div>
+          <div id="code-output" style="display: none;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="tariffs">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-left">
+          <a href="#" class="logo">
+            <span class="logo-dot"></span>
+            ConcreteFlow
+          </a>
+          <p class="footer-desc">Цифровая экосистема для автоматизации производства, сбыта и логистики строительных смесей.</p>
+        </div>
+        
+        <div class="footer-links">
+          <div class="footer-column">
+            <span class="footer-heading">Продукт</span>
+            <a href="#features" class="footer-link">Возможности</a>
+            <a href="#integrations" class="footer-link">Интеграции</a>
+            <a href="#api" class="footer-link">API разработчика</a>
+          </div>
+          
+          <div class="footer-column">
+            <span class="footer-heading">Компания</span>
+            <a href="#" class="footer-link">О нас</a>
+            <a href="#" class="footer-link">Контакты</a>
+            <a href="#" class="footer-link">Безопасность</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <span>© 2026 ООО «КонкретФлоу». Все права защищены.</span>
+        <div class="footer-bottom-links">
+          <a href="#" class="footer-link">Условия использования</a>
+          <a href="#" class="footer-link">Конфиденциальность</a>
+          <span style="color: var(--text-muted);">Сделано в Костроме</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mock database payloads for endpoints
+    const ENDPOINT_DATA = {
+      mixers: {
+        filename: 'mixers_status.json',
+        statusText: '200 OK',
+        statusClass: 'success',
+        payload: `{
+  "status": "success",
+  "timestamp": "2026-05-23T16:14:00Z",
+  "mixers_online": 14,
+  "data": [
+    {
+      "id": 104,
+      "plate": "А320УТ777",
+      "driver": "Алексей Соколов",
+      "state": "en_route",
+      "volume_m3": 8.0,
+      "concrete_brand": "M400",
+      "temp_celsius": 18.4,
+      "eta_minutes": 12
+    },
+    {
+      "id": 108,
+      "plate": "В441КХ799",
+      "driver": "Дмитрий Козлов",
+      "state": "pouring",
+      "volume_m3": 10.0,
+      "concrete_brand": "M300",
+      "temp_celsius": 19.1,
+      "eta_minutes": 0
+    }
+  ]
+}`
+      },
+      'order-create': {
+        filename: 'order_create.json',
+        statusText: '201 Created',
+        statusClass: 'success',
+        payload: `{
+  "status": "created",
+  "order_id": "cf-90281-x",
+  "customer": "ООО МонолитСтрой",
+  "volume_m3": 24.0,
+  "delivery_points": 1,
+  "scheduled_time": "2026-05-24T08:00:00Z",
+  "authorized_by": "api_key_prod_concreteflow"
+}`
+      },
+      'telemetry-ws': {
+        filename: 'telemetry_stream.log',
+        statusText: '101 Protocols',
+        statusClass: 'success',
+        payload: `[ws] Connection established to wss://api.concreteflow.ru/v1/telemetry/live
+[ws] Subscribed to topic: mixers.all.telemetry
+[telemetry] Mixer 104: {
+  "speed_kmh": 42.5,
+  "drum_rotation_rpm": 12.0,
+  "water_added_liters": 0,
+  "coordinates": {
+    "lat": 57.7672,
+    "lng": 40.9269
+  }
+}`
+      }
+    };
+
+    // DOM Elements for API Simulator
+    const selectButtons = document.querySelectorAll('.api-select-btn');
+    const tabFilename = document.getElementById('tab-filename');
+    const responseStatus = document.getElementById('response-status');
+    const loaderProgress = document.getElementById('loader-progress');
+    const terminalPlaceholder = document.getElementById('terminal-placeholder');
+    const codeOutput = document.getElementById('code-output');
+
+    // State lock to prevent concurrent triggers
+    let isRequesting = false;
+
+    // Trigger API Request Simulator
+    function triggerApiRequest(endpointKey) {
+      if (isRequesting) return;
+      isRequesting = true;
+
+      // Select active endpoint details
+      const config = ENDPOINT_DATA[endpointKey];
+      if (!config) return;
+
+      // 1. Reset screen, show loader state
+      codeOutput.style.display = 'none';
+      terminalPlaceholder.style.display = 'none';
+      
+      // Update header details to pending
+      tabFilename.textContent = config.filename;
+      responseStatus.textContent = 'PENDING...';
+      responseStatus.className = 'editor-status-badge pending';
+      
+      // Run loader progress bar animation
+      loaderProgress.style.display = 'block';
+
+      // 2. Wait 800ms to simulate network latency
+      setTimeout(() => {
+        // Complete loader progress
+        loaderProgress.style.display = 'none';
+        
+        // Show status code success
+        responseStatus.textContent = config.statusText;
+        responseStatus.className = `editor-status-badge ${config.statusClass}`;
+        
+        // Show and populate code output
+        codeOutput.innerHTML = '';
+        codeOutput.style.display = 'block';
+        
+        // Render syntax-highlighted characters
+        formatAndTypeJSON(config.payload, codeOutput, () => {
+          isRequesting = false;
+        });
+
+      }, 800);
+    }
+
+    // Helper to format JSON/Log and display it line by line
+    function formatAndTypeJSON(rawText, containerElement, callback) {
+      const lines = rawText.split('\n');
+      let currentLineIndex = 0;
+
+      function renderNextLine() {
+        if (currentLineIndex >= lines.length) {
+          if (callback) callback();
+          return;
+        }
+
+        const lineText = lines[currentLineIndex];
+        const lineElement = document.createElement('div');
+        lineElement.className = 'code-line';
+
+        const numSpan = document.createElement('span');
+        numSpan.className = 'line-number';
+        numSpan.textContent = currentLineIndex + 1;
+
+        const contentSpan = document.createElement('span');
+        contentSpan.className = 'code-content';
+        
+        // Basic Syntax Highlighting rules inside lines
+        let highlighted = lineText
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+
+        // Highlight JSON structure if not a WebSocket log plain text line
+        if (rawText.startsWith('{') || rawText.includes('{')) {
+          highlighted = highlighted
+            // Highlight keys
+            .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")(\s*:)/g, '<span class="json-key">$1</span>$3')
+            // Highlight string values
+            .replace(/:\s*("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-string">$1</span>')
+            // Highlight numbers
+            .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
+            // Highlight booleans
+            .replace(/:\s*(true|false)/g, ': <span class="json-boolean">$1</span>')
+            // Highlight nulls
+            .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>');
+        } else {
+          // WebSocket log style formatting
+          highlighted = highlighted
+            .replace(/^(\[ws\])/, '<span class="json-boolean">$1</span>')
+            .replace(/^(\[telemetry\])/, '<span class="json-key">$1</span>')
+            .replace(/("telemetry_update"|Telemetry)/, '<span class="json-string">$1</span>')
+            .replace(/(\b\d+\.\d+|\b\d+\b)/g, '<span class="json-number">$1</span>');
+        }
+
+        contentSpan.innerHTML = highlighted;
+
+        lineElement.appendChild(numSpan);
+        lineElement.appendChild(contentSpan);
+        containerElement.appendChild(lineElement);
+
+        currentLineIndex++;
+        // Rapid output for lines to keep UI fluid
+        setTimeout(renderNextLine, 25);
+      }
+
+      renderNextLine();
+    }
+
+    // Attach Event Listeners to selectors
+    selectButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        if (isRequesting) return;
+        
+        // Remove active state from all buttons
+        selectButtons.forEach(btn => btn.classList.remove('active'));
+        
+        // Add active state to clicked button
+        const clickedButton = e.currentTarget;
+        clickedButton.classList.add('active');
+        
+        const endpoint = clickedButton.getAttribute('data-endpoint');
+        triggerApiRequest(endpoint);
+      });
+    });
+
+    // Auto-load first endpoint telemetry simulation on mount
+    window.addEventListener('DOMContentLoaded', () => {
+      triggerApiRequest('mixers');
+    });
+
+    // Live dashboard order dynamic updates (Perpetual Micro-Interactions)
+    const orderItems = document.querySelectorAll('.order-item');
+    setInterval(() => {
+      // Simulate status shifts occasionally to show live activity
+      const randomIndex = Math.floor(Math.random() * orderItems.length);
+      const randomItem = orderItems[randomIndex];
+      const statusLabel = randomItem.querySelector('.order-status');
+      
+      // Let's only update en-route/pouring items temporarily
+      if (statusLabel.classList.contains('en-route')) {
+        const timeLabel = statusLabel.textContent.match(/\d+/);
+        if (timeLabel) {
+          let time = parseInt(timeLabel[0], 10);
+          time = time > 1 ? time - 1 : 12; // Decrease ETA or reset
+          statusLabel.innerHTML = `<span class="status-dot blue"></span>В пути (${time} мин)`;
+        }
+      }
+    }, 8000);
+  </script>
+</body>
+</html>
